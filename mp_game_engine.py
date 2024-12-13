@@ -43,7 +43,7 @@ def check_end(board1,board2):
         return True
     return False
 
-def process_attack(board,coords,battleships):
+def process_attack(board,coords):
     '''Processes the given attack on the given board.
 
     Args:
@@ -55,24 +55,15 @@ def process_attack(board,coords,battleships):
 
     Returns: List containing type of ship hit and the updated board.
     '''
-    values = []
     x = coords[0]
     y = coords[1]
     if(board[x][y] != None):
-        ship = board[x][y]
-        values.append(ship)
         board[x][y] = None
-        battleships[ship] = battleships[ship] - 1
-        if(battleships[ship] == 0):
-            print(f"{ship} sunk!")
-        else:
-            print(f"{ship} hit at ({x},{y}).")
-    values.append(board)
-    return values
+    return board
 
 def ai_opponent_game_loop():
     '''
-
+    Game loop with AI opponent.
     '''
     print("Welcome to Battleships!")
     name1 = input("Player 1's name: ")
@@ -93,15 +84,29 @@ def ai_opponent_game_loop():
     while(check_end(player_board,ai_board) == False):
         #attack from player and process on ai's board
         coords = game_engine.cli_coordinates_input()
-        ai_attacked = process_attack(ai_board,coords,ai_ships)
-        ai_board = ai_attacked[1]
-        ai_ships[ai_attacked[0]] = ai_ships[ai_attacked[0]] - 1
+        x = coords[0]
+        y = coords[1]
+        if(ai_board[x][y] != None):
+            ship = ai_board[x][y]
+            ai_ships[ship] = ai_ships[ship] - 1
+            if(ai_ships[ship] == 0):
+                print(f"{ship} sunk!")
+            else:
+                print(f"{ship} hit at ({x},{y}).")
+        ai_board = process_attack(ai_board,coords,ai_ships)
         #generate AI attack and process on player board
         print("Computer attack: ")
         ai_attack = generate_attack(player_board)
-        player_attacked = process_attack(player_board,ai_attack,player_ships)
-        player_board = player_attacked[1]
-        player_ships[player_attacked[0]] = player_ships[player_attacked[0]] - 1
+        x = ai_attack[0]
+        y = ai_attack[1]
+        if(player_board[x][y] != None):
+            ship = player_board[x][y]
+            player_ships[ship] = player_ships[ship] - 1
+            if(player_ships[ship] == 0):
+                print(f"Computer has sunk your {ship}!")
+            else:
+                print(f"{ship} hit by computer at ({x},{y}).")
+        player_board = process_attack(player_board,ai_attack,player_ships)
         #print ascii representation of player board after ai attack
         for i in player_board:
             print(i)
@@ -138,3 +143,5 @@ name2 = input("Enter player 2's name: ")
 #assign their names as keys and list of board/battleships as values
 players[name1] = player1
 players[name2] = player2
+
+ai_opponent_game_loop()
