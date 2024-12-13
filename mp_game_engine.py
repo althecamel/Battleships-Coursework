@@ -3,6 +3,7 @@ import game_engine
 import random
 
 global board
+global players 
 
 def generate_attack(board):
     '''Generates coordinates of AI's attack.
@@ -43,73 +44,97 @@ def check_end(board1,board2):
     return False
 
 def process_attack(board,coords,battleships):
+    '''Processes the given attack on the given board.
+
+    Args:
+        board: Player's board containing ships.
+
+        coords: Coordinates of attack.
+
+        battleships: Dictionary of battleships.
+
+    Returns: List containing type of ship hit and the updated board.
     '''
-    '''
+    values = []
     x = coords[0]
     y = coords[1]
     if(board[x][y] != None):
         ship = board[x][y]
+        values.append(ship)
         board[x][y] = None
         battleships[ship] = battleships[ship] - 1
         if(battleships[ship] == 0):
             print(f"{ship} sunk!")
         else:
             print(f"{ship} hit at ({x},{y}).")
-    return board
+    values.append(board)
+    return values
 
 def ai_opponent_game_loop():
     '''
+
     '''
     print("Welcome to Battleships!")
-    #initialise board for player and computer
-    board = components.initialise_board()
-    #create separate dictionaries of battleships for each player
-    player_battleships = components.create_battleships()
-    ai_battleships = components.create_battleships()
-    
-    player_board = components.place_battleships(board,player_battleships,'custom')
-    ai_board = components.place_battleships(board,ai_battleships,'random')
-    name1 = input("Enter player 1's name: ")
-    #add players to dictionary
-    players[name1] = player_board
-    players['Computer'] = ai_board
+    name1 = input("Player 1's name: ")
+    #change keys of players dictionary for player and computer
+    ini_list = [name1,'Computer']
+    players_new = dict(zip(ini_list,list(players.values())))
+    #shortcut to player's board and battleships list
+    player_list = players_new[name1]
+    player_ships = player_list[1]
+    #shortcut to computer's board and battleships list
+    ai_list = players_new['Computer']
+    ai_ships = ai_list[1]
+    #place player's battleships with custom algorithm
+    player_board = components.place_battleships(player_list[0],player_ships,'custom')
+    #create ai board with random placement
+    ai_board = components.place_battleships(ai_list[0],ai_ships,'random')
     #game loop
-    while(check_end(players[name1],players['Computer']) == False):
+    while(check_end(player_board,ai_board) == False):
         #attack from player and process on ai's board
         coords = game_engine.cli_coordinates_input()
-        ai_board = process_attack(ai_board,coords,ai_battleships)
+        ai_attacked = process_attack(ai_board,coords,ai_ships)
+        ai_board = ai_attacked[1]
+        ai_ships[ai_attacked[0]] = ai_ships[ai_attacked[0]] - 1
         #generate AI attack and process on player board
         print("Computer attack: ")
         ai_attack = generate_attack(player_board)
-        player_board = process_attack(player_board,ai_attack,player_battleships)
+        player_attacked = process_attack(player_board,ai_attack,player_ships)
+        player_board = player_attacked[1]
+        player_ships[player_attacked[0]] = player_ships[player_attacked[0]] - 1
         #print ascii representation of player board after ai attack
         for i in player_board:
             print(i)
     total1 = 0
     total2 = 0
-    for key,value in zip(player_battleships):
+    for value in player_ships.values():
         if(value == 0):
             total1 += 1
-    for key,value in zip(ai_battleships):
+    for value in ai_ships.values():
         if(value == 0):
             total2 += 1
 
-    if(total1 == 0):
+    if(total1 == 5):
         print("Player wins!")
     else:
         print("Computer wins!")
 
 #global namespace
 players = {}
-
-board = components.initialise_board()
+#initialise their board and battleships
+player1_board = components.initialise_board()
+player2_board = components.initialise_board()
 player1_battleships = components.create_battleships()
 player2_battleships = components.create_battleships()
-player1_board = components.place_battleships(board,player1_battleships,'random')
-player2_board = components.place_battleships(board,player2_battleships,'random')
+#create list containing their empty board and battleships
+player1 = []
+player1.append(player1_board)
+player1.append(player1_battleships)
+player2 = []
+player2.append(player2_board)
+player2.append(player2_battleships)
 name1 = input("Enter player 1's name: ")
 name2 = input("Enter player 2's name: ")
-#add players to dictionary
-players[name1] = player1_board
-players[name2] = player2_board
-
+#assign their names as keys and list of board/battleships as values
+players[name1] = player1
+players[name2] = player2

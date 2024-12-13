@@ -1,15 +1,15 @@
 Battleships:
-Battleships is a 2-player strategic game in which each player has a grid of ships, with the objective of sinking the opponent's ships as they take turns guessing coordinates.
+Battleships is a 2-player strategy game in which each player has a grid containing various sized ships they place, with the objective of sinking the opponent's ships as they take turns guessing coordinates.
 
 Features completed:
 - initialise the playing board as a grid of coordinates
 - read in battleships from a text file as a dictionary
 - place the battleships on the board
-- implements an option to choose from multiple algorithms for placement of the ships on the board
-- processes attacks by the player using coordinates they input
+- implements option to choose from multiple placement algorithms including simple, random and custom
+- processes attacks by the player using their coordinates
 - a simple game loop in the command-line interface
-- generates an AI attack as a tuple of coordinates randomly
-- implements an AI opponent command-line interface game loop
+- generates an AI attack as a random tuple of coordinates
+- implements an AI opponent in the command-line interface
 - adds a graphical user interface with Flask, including a placement page for the battleships and a gameplay page for attacks
 
 Additional features:
